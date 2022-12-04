@@ -80,7 +80,7 @@ def main(argv):
             filename = argv[2]
             operation = argv[3]
         else:
-            filename = 'Data/day_01.txt'
+            filename = 'data/d1.txt'
             operation = max
 
         make_report(filename=filename,operation=operation)
@@ -89,7 +89,7 @@ def main(argv):
         if len(argv) == 4:
             filename = argv[2]
         else:
-            filename = 'Data/day_01.txt'
+            filename = 'data/d1.txt'
         
         make_counter_report(filename)
 
