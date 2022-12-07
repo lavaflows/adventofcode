@@ -8,9 +8,9 @@ from collections import defaultdict
 def read_file(filename:str)->list:
     with open(filename,'rt') as file:
         rows = csv.reader(file)    
-        data = []    
+        data = []
         for line in rows:
-            data.append(line)             
+            data.append(line[0])             
         return data
 
 def compartments(rucksack):
@@ -31,7 +31,7 @@ def read_compartment(rucksack):
 
     common_item = []
     for sack in rucksack:
-        c1,c2 = compartments(sack[0])
+        c1,c2 = compartments(sack)
         for i in c1:
             if i in c2:
                 common_item.append(i)
@@ -46,11 +46,12 @@ def read_compartment(rucksack):
 if __name__ == '__main__':
     filename = 'data/d3.txt'
     d = read_file(filename)
-    add = sum(read_compartment(d))
+    sum_priority = sum(read_compartment(d))
+
+    print(f'Sum of the priorities of those item types in each rucksack: {sum_priority}')
     
    
-    sets = [set(r[0]) for r in d]
-    
+    sets = [set(r) for r in d]    
     counter = 0
     group = defaultdict(list)
 
@@ -63,8 +64,11 @@ if __name__ == '__main__':
 
     intersection = []
 
-    for v in group.values():
-        intersection.append(v[0].intersection(v[1],v[2]))
+    for elf1,elf2,elf3 in group.values():
+        badge = list(elf1.intersection(elf2,elf3))
+        intersection.append(priority(badge[0]))
+
+    print(f'Sum of the priority of each badge: {sum(intersection)}')
 
 
 
