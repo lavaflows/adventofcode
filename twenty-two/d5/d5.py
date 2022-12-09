@@ -2,6 +2,7 @@ import csv
 import re
 import copy
 from collections import defaultdict
+from pprint import pprint
 
 import pdb
 
@@ -63,12 +64,15 @@ def move_commands(crate, moves):
     
     for move_no,move in enumerate(moves,start=1):
         no_items,from_crate,to_crate = parse_moves(move)
-        pdb.set_trace()
         count = 1
-        while count <= no_items:            
+        while count <= no_items:          
             print(f'Move # {move_no} - On: {count} out of {no_items}: Moving to {adjusted_crate[to_crate]}')
-            item = adjusted_crate[from_crate].pop()            
-            adjusted_crate[to_crate].append(item)
+            try:
+                item = adjusted_crate[from_crate].pop()            
+                adjusted_crate[to_crate].append(item)
+            except IndexError as err:
+                pdb.set_trace()
+                raise         
             count += 1
     
     return adjusted_crate
@@ -81,3 +85,9 @@ if __name__ == '__main__':
     crates, moves = read_data(filename=filename)
     crate_data = crate_creation(crates)
     z = move_commands(crate_data, moves)
+    keys = [i for i in z.keys()]
+    keys.sort()
+
+    ontop = ''
+    for i in keys:
+        ontop+=z[i][len(z[i])-1]
