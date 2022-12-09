@@ -48,32 +48,42 @@ def crate_creation(data:list):
 
 def parse_moves(moves):
     import re
-    move_pattern = re.compile(r'(move \d)')
-    from_pattern = re.compile(r'from \d')
-    to_pattern = re.compile(r'to \d')
+    pattern = re.compile(r'\d+')
+    mo,fr,to = pattern.findall(moves)
 
-    mo = move_pattern.search(moves).group()
-    fr = from_pattern.search(moves).group()
-    to = to_pattern.search(moves).group()
+    return (int(mo),int(fr),int(to))
 
-    return (int(mo[len(mo)-1]),int(fr[len(fr)-1]),int(to[len(to)-1]))
-
-def move_commands(crate, moves):
+def move_commands(crate, moves,mover_version=9000, silence=True):
     
     adjusted_crate = copy.deepcopy(crate)
     
-    for move_no,move in enumerate(moves,start=1):
-        no_items,from_crate,to_crate = parse_moves(move)
-        count = 1
-        while count <= no_items:          
-            print(f'Move # {move_no} - On: {count} out of {no_items}: Moving to {adjusted_crate[to_crate]}')
-            try:
-                item = adjusted_crate[from_crate].pop()            
-                adjusted_crate[to_crate].append(item)
-            except IndexError as err:
-                pdb.set_trace()
-                raise         
-            count += 1
+    if mover_version == 9000:
+        for move_no,move in enumerate(moves,start=1):
+            no_items,from_crate,to_crate = parse_moves(move)
+            count = 1
+            while count <= no_items:          
+                if not silence:
+                    print(f'Move # {move_no} - On: {count} out of {no_items}: Moving to {adjusted_crate[to_crate]}')
+                try:
+                    item = adjusted_crate[from_crate].pop()            
+                    adjusted_crate[to_crate].append(item)
+                except IndexError as err:
+                    raise         
+                count += 1
+    elif mover_version == 9001:
+        for move_no,move in enumerate(moves,start=1):
+            no_items,from_crate,to_crate = parse_moves(move)
+            count = 1
+            item = []
+            while count <= no_items:
+                if not silence:
+                    print(f'Move # {move_no} - On: {count} out of {no_items}: Moving to {adjusted_crate[to_crate]}')
+                try:
+                    item.insert(0,adjusted_crate[from_crate].pop())
+                except IndexError as err:
+                    raise         
+                count += 1
+            adjusted_crate[to_crate].extend(item)
     
     return adjusted_crate
 
@@ -84,10 +94,21 @@ if __name__ == '__main__':
     filename = 'data/d5.txt'
     crates, moves = read_data(filename=filename)
     crate_data = crate_creation(crates)
-    z = move_commands(crate_data, moves)
-    keys = [i for i in z.keys()]
+    move_9000 = move_commands(crate_data, moves,mover_version=9000)
+    keys = [i for i in move_9000.keys()]
     keys.sort()
 
-    ontop = ''
+    ontop_9000 = ''
     for i in keys:
-        ontop+=z[i][len(z[i])-1]
+        ontop_9000+=move_9000[i][len(move_9000[i])-1]
+
+    move_9001 = move_commands(crate_data, moves,mover_version=9001)
+    keys = [i for i in move_9001.keys()]
+    keys.sort()
+
+    ontop_9001 = ''
+    for i in keys:
+        ontop_9001+=move_9001[i][len(move_9001[i])-1]
+
+    print(f'Part 1: Crates on top are: {ontop_9000}')
+    print(f'Part 2: Crates on top are: {ontop_9001}')
