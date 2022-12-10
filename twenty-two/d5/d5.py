@@ -7,7 +7,10 @@ from pprint import pprint
 import pdb
 
 
-def read_data(filename):
+def read_data(filename:str)->tuple:
+    '''
+    Reads elf file and returns a tuple with crates and moves as a list
+    '''
 
     crates = []
     moves = []
@@ -26,11 +29,20 @@ def read_data(filename):
     return (crates,moves)
 
 def get_item_index(data:str)->list:
-    #  input: ' 1 2 3 4 5 ', returns index where numbers are located
+    '''
+    Returns index where each item is going to align under from the 
+    data.
+
+    input: ' 1 2 3 4 5 ', returns index where numbers are located
+    '''  
     items = data.replace(' ','')
     return [data.index(char) for char in items]
 
-def crate_creation(data:list):
+def crate_creation(data:list)->dict:
+    '''
+    Takes list of data and returns a crates as a dictionary where
+    crate[1] corresponds to stack 1 with a list of crates stacked ontop of each other.
+    '''
 
     crates = defaultdict(list)
     index_data = data.pop()
@@ -46,7 +58,11 @@ def crate_creation(data:list):
     
     return crates
 
-def parse_moves(moves):
+def parse_moves(moves:str)-> tuple:
+    '''
+    Parses string 'move x from y to z' where x,y,z can be any integer
+    Returns tuple (number_of_moves, from_crate, to_crate) as integers
+    '''
     import re
     pattern = re.compile(r'\d+')
     mo,fr,to = pattern.findall(moves)
@@ -54,6 +70,10 @@ def parse_moves(moves):
     return (int(mo),int(fr),int(to))
 
 def move_commands(crate, moves,mover_version=9000, silence=True):
+    '''
+    Routine to implement all move commands. Makes a copy of the original
+    crate dicitonary so as to not modify it.
+    '''
     
     adjusted_crate = copy.deepcopy(crate)
     
